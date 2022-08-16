@@ -5,14 +5,14 @@
     type="button"
     class="playButton"
     @click="handlePlayClick"
-    :disabled="buttonDisabled"
+    :disabled="buttonDisabled || blockVisible.visible"
   >
     play
   </button>
 
-  <Block v-if="blockVisible" @show-result="showResult" />
+  <Block v-if="blockVisible.visible" @show-result="showResult" />
 
-  <Result :result="clickTime" />
+  <Result v-if="result" :result="result" />
 </template>
 
 <script>
@@ -29,42 +29,56 @@ export default {
   components: { Block, Result },
   data() {
     return {
-      blockVisible: false,
-      blockVisiblityTime: null,
-      resultVisible: false,
+      blockVisible: {
+        visible: false,
+        time: null,
+      },
+      result: null,
       buttonDisabled: false,
-      clickTime: null,
     };
   },
   methods: {
     handlePlayClick() {
       this.buttonDisabled = true;
-      this.resultVisible = false;
-      this.clickTime = null;
-      this.blockVisiblityTime = null;
+      this.result = null;
+      this.blockVisible.time = null;
 
       setTimeout(() => {
         this.buttonDisabled = false;
-        this.blockVisible = true;
-        this.blockVisiblityTime = Date.now();
+        this.blockVisible.visible = true;
+        this.blockVisible.time = Date.now();
       }, generateRandomDelay(2));
     },
     showResult() {
-      const clickTime = Date.now() - this.blockVisiblityTime;
-      this.clickTime = clickTime;
-      this.blockVisible = false;
-      this.resultVisible = true;
+      const result = Date.now() - this.blockVisible.time;
+      this.result = result;
+      this.blockVisible.visible = false;
     },
   },
-  // computed: {
-  //   result() {
-  //     console.log({
-  //       "Date.now()": Date.now(),
-  //       "this.blockVisiblityTime": this.blockVisiblityTime,
-  //     });
-  //     return Date.now() - this.blockVisiblityTime;
-  //   },
-  // },
+  beforeCreate() {
+    console.log(`the component is not yet created. You can't access the data`);
+  },
+  created() {
+    console.log(`the component is  created. You can access the data`);
+  },
+  beforeMount() {
+    console.log(`Not mounted to the DOM yet.`);
+  },
+  mounted() {
+    console.log(`the component is now mounted to the DOM.`);
+  },
+  beforeUpdate() {
+    console.log(`Data has changed, but UI not updated`);
+  },
+  updated() {
+    console.log(`Data has changed, and UI updated`);
+  },
+  beforeUnmount() {
+    console.log(`Before component is unmounted`);
+  },
+  unmounted() {
+    console.log(`Component is unmounted`);
+  },
 };
 </script>
 
